@@ -5,6 +5,13 @@ A Helm chart to deploy `pdns-admin` in a Kubernetes cluster.  See https://github
 **Important:** Please note that this Helm chart is intended to install only the Web UI components, not PowerDNS itself.  Therefore, we only deal with the [pdns-admin-uwsgi](https://github.com/pschiffe/docker-pdns#pdns-admin-uwsgi) and [pdns-admin-static](https://github.com/pschiffe/docker-pdns#pdns-admin-static) components of the git project mentioned above.
 
 
+### Usage
+
+    helm repo add pdns-admin-helm https://raw.githubusercontent.com/boarder981/pdns-admin-helm/master/repo
+
+    helm install...
+
+
 ### Caveats
 
 Kubernetes injects some default environment variables into each container.  It uses the deployment or container name to prefix these variables, then converts to uppercase and substitutes underscores.  For example, a deployment named `pdns-admin` would create containers with some environment variables prefixed with `PDNS_ADMIN_`.

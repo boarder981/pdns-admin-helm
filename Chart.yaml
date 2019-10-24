@@ -1,6 +1,6 @@
 apiVersion: v1
 description: A Helm chart for pdns-admin UI
-name: pdns-admin
+name: pdns-admin-helm
 version: 0.1.0
 appVersion: latest
 sources:
