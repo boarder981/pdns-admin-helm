@@ -9,6 +9,8 @@ A Helm chart to deploy `pdns-admin` in a Kubernetes cluster.  See https://github
 
     helm repo add pdns-admin-helm https://raw.githubusercontent.com/boarder981/pdns-admin-helm/master/repo
 
+    helm repo update
+
     helm install...
 
 
