@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  pdns-admin-helm:
+  - apiVersion: v1
+    appVersion: latest
+    created: "2019-10-24T16:21:35.456208-04:00"
+    description: A Helm chart for pdns-admin UI
+    digest: ccbc2f17adf63d09c144215233d86117a11b6a893a460dea88a8d45ffdc7108f
+    name: pdns-admin-helm
+    sources:
+    - https://github.com/pschiffe/docker-pdns
+    urls:
+    - charts/pdns-admin-helm-0.1.0.tgz
+    version: 0.1.0
+generated: "2019-10-24T16:21:35.453835-04:00"
