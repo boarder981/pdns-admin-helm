@@ -1,0 +1,109 @@
+# Default values for pdns-admin
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+# params for secret where sensitive data will be stored
+secret:
+  # if true, it will create the secret
+  # leave as false if the secret already exists in your namespace
+  enabled: false
+  name: powerdns-admin-secrets
+
+# external MySQL parameters
+mysql:
+  host: mysql
+  port: 3306
+  user: root
+  dbName: powerdnsadmin
+  dbPassword: ""
+
+# PowerDNS parameters
+powerdns:
+  apiUrl: http://pdns:8081/
+  apiKey: ""
+  version: ""
+
+# LDAP parameters
+ldap:
+  enabled: false
+  type: ldap
+  uri: ldaps://ldap.example.com:636
+  user: uid=pdnsadmin,dc=example,dc=com
+  password: ""
+  searchBase: dc=example,dc=com
+  userNameField: uid
+  filter: (memberOf=pdnsadmin,ou=groups,dc=example,dc=com)
+
+# some extra vars for uwsgi component
+serviceTags: eastus
+serviceRegion: eastus
+
+# components of the deployment
+components:
+  uwsgi:
+    name: uwsgi
+    replicaCount: 1
+    image:
+      repository: pschiffe/pdns-admin-uwsgi
+      tag: latest
+      pullPolicy: IfNotPresent
+      pullSecretName: ""
+    service:
+      port: 9494
+      sessionAffinity: ClientIP
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #  cpu: 100m
+      #  memory: 128Mi
+      # requests:
+      #  cpu: 100m
+      #  memory: 128Mi
+
+  static:
+    name: static
+    replicaCount: 1
+    image:
+      # repository: dockerhub.ogilvy.com/omg/powerdns-admin-ui
+      repository: pschiffe/pdns-admin-static
+      tag: latest
+      pullPolicy: IfNotPresent
+      pullSecretName: ""
+    service:
+      type: ClusterIP
+      port: 8999
+      targetPort: 80
+      sessionAffinity: None
+      # set annotations for stickiness, see README
+      # annotations: {}
+      #   traefik.ingress.kubernetes.io/affinity: "true"
+      #   traefik.ingress.kubernetes.io/session-cookie-name: "sticky"
+    ingress:
+      enabled: true
+      # Used to create Ingress record (should be used with service.type: ClusterIP).
+      hosts:
+        - pdns-admin.example.com
+      # set ingress class, i.e. nginx, traefik, etc
+      annotations: {}
+      #   kubernetes.io/ingress.class: "traefik"
+      labels: {}
+      # tls:
+      #   Secrets must be manually created in the namespace.
+      #   - secretName: chart-example-tls
+      #     hosts:
+      #       - chart-example.local
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #  cpu: 100m
+      #  memory: 128Mi
+      # requests:
+      #  cpu: 100m
+      #  memory: 128Mi

@@ -1,0 +1,37 @@
+{{- $appName := include "pdns-admin.name" . -}}
+{{- $fullName := include "pdns-admin.fullname" . -}}
+{{- $commonLabels := include "pdns-admin.commonLabels" . -}}
+{{- $matchLabels := include "pdns-admin.matchLabels" . -}}
+
+{{ range $component, $config := .Values.components }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-{{ $config.name }}
+  labels:
+    {{- $commonLabels | nindent 4 }}
+    component: {{ $component }}
+  {{- if $config.service.annotations }}
+  annotations:
+  {{- range $key, $value := $config.service.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  {{- end }}
+spec:
+  {{- if $config.service.type }}
+  type: {{ $config.service.type }}
+  {{- end }}
+  ports:
+    - port: {{ $config.service.port }}
+      protocol: TCP
+      name: {{ $fullName }}
+      {{- if $config.service.targetPort }}
+      targetPort: {{ $config.service.targetPort }}
+      {{- end }}
+  selector:
+    {{- $matchLabels | nindent 4 }}
+    component: {{ $config.name }}
+  sessionAffinity: {{ $config.service.sessionAffinity }}
+{{- end -}}

@@ -1,0 +1,115 @@
+{{- $appName := include "pdns-admin.name" . -}}
+{{- $fullName := include "pdns-admin.fullname" . -}}
+{{- $commonLabels := include "pdns-admin.commonLabels" . -}}
+{{- $matchLabels := include "pdns-admin.matchLabels" . -}}
+
+{{- with .Values.components.uwsgi }}
+{{- $port := .service.port -}}
+{{- $secretName := $.Values.secret.name -}}
+
+---
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ $fullName }}-{{ .name }}
+  labels:
+    {{- $commonLabels | nindent 4 }}
+    component: {{ .name }}
+spec:
+  replicas: {{ .replicaCount }}
+  serviceName: {{ $fullName }}-{{ .name }}
+  selector:
+    matchLabels:
+      {{- $matchLabels | nindent 6 }}
+      component: {{ .name }}
+  template:
+    metadata:
+      labels:
+        {{- $commonLabels | nindent 8 }}
+        component: {{ .name }}
+    spec:
+      containers:
+      - name: {{ $.Chart.Name }}
+        image: "{{ .image.repository }}:{{ .image.tag }}"
+        imagePullPolicy: {{ .image.pullPolicy }}
+        env:
+        - name: PDNS_ADMIN_SQLA_DB_HOST
+          value: {{ $.Values.mysql.host | squote | quote }}
+        - name: PDNS_ADMIN_SQLA_DB_PORT
+          value: {{ $.Values.mysql.port | squote | quote }}
+        - name: PDNS_ADMIN_SQLA_DB_USER
+          value: {{ $.Values.mysql.user | squote | quote }}
+        - name: PDNS_ADMIN_SQLA_DB_NAME
+          value: {{ $.Values.mysql.dbName | squote | quote }}
+        - name: PDNS_ADMIN_PDNS_STATS_URL
+          value: {{ $.Values.powerdns.apiUrl | squote | quote }}
+        - name: PDNS_ADMIN_PDNS_VERSION
+          value: {{ $.Values.powerdns.version | squote | quote }}
+        {{- if $.Values.ldap.enabled }}
+        - name: PDNS_ADMIN_LDAP_TYPE
+          value: {{ $.Values.ldap.type | squote | quote }}
+        - name: PDNS_ADMIN_LDAP_URI
+          value: {{ $.Values.ldap.uri | squote | quote }}
+        - name: PDNS_ADMIN_LDAP_USERNAME
+          value: {{ $.Values.ldap.user | squote | quote }}
+        - name: PDNS_ADMIN_LDAP_SEARCH_BASE
+          value: {{ $.Values.ldap.searchBase | squote | quote }}
+        - name: PDNS_ADMIN_LDAP_USERNAMEFIELD
+          value: {{ $.Values.ldap.userNameField | squote | quote }}
+        - name: PDNS_ADMIN_LDAP_FILTER
+          value: {{ $.Values.ldap.filter | squote | quote }}
+        - name: PDNS_ADMIN_LDAP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ $secretName }}
+              key: ldap_password
+        {{- end }}
+        - name: PDNS_ADMIN_SQLA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ $secretName }}
+              key: mysql_db_password
+        - name: PDNS_ADMIN_PDNS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ $secretName }}
+              key: api_key
+        ports:
+          - containerPort: {{ $port }}
+            protocol: TCP
+        livenessProbe:
+          failureThreshold: 3
+          tcpSocket:
+            port: {{ $port }}
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          tcpSocket:
+            port: {{ $port }}
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        {{- if .resources }}
+        resources:
+{{- toYaml .resources | nindent 10 }}
+          {{- end }}
+      volumeMounts:
+      - mountPath: /opt/powerdns-admin/upload
+        name: {{ $fullName }}-{{ .name }}
+    {{- if .nodeSelector }}
+      nodeSelector:
+        {{ toYaml .nodeSelector | indent 8 }}
+    {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ $fullName }}-{{ .name }}
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: default
+      resources:
+        requests:
+          storage: 2Gi
+{{ end -}}

@@ -1,0 +1,42 @@
+{{- $appName := include "pdns-admin.name" . -}}
+{{- $fullName := include "pdns-admin.fullname" . -}}
+{{- $commonLabels := include "pdns-admin.commonLabels" . -}}
+{{- $matchLabels := include "pdns-admin.matchLabels" . -}}
+
+{{- with .Values.components.static -}}
+{{- if .ingress.enabled -}}
+{{- $port := .service.port -}}
+{{- $serviceNamePostfix := .name -}}
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-{{ .name }}
+  labels:
+    {{- $commonLabels | nindent 4 }}
+    component: {{ .name }}
+  {{- range $key, $value := .ingress.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  annotations:
+  {{- range $key, $value := .ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+spec:
+  rules:
+    {{- range $host := .ingress.hosts }}
+    - host: {{ $host }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ $fullName }}-{{ $serviceNamePostfix }}
+              servicePort: {{ $port }}
+    {{- end -}}
+  {{- if .ingress.tls }}
+  tls:
+{{ toYaml .ingress.tls | indent 4 }}
+  {{- end -}}
+{{- end -}}
+{{- end -}}
