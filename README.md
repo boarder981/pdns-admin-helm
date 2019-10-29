@@ -84,7 +84,7 @@ If you wish to supply the values and let the chart create the secret, you have t
 
         helm install ... \
           --set secret.enabled=true \
-          --set pdns.apiKey="my-api-key" \
+          --set powerdns.apiKey="my-api-key" \
           --set mysql.dbPassword="my-db-password" \
           --set ldap.password="my-ldap-password"
 
