@@ -95,9 +95,9 @@ spec:
         resources:
 {{- toYaml .resources | nindent 10 }}
           {{- end }}
-      volumeMounts:
-      - mountPath: /opt/powerdns-admin/upload
-        name: {{ $fullName }}-{{ .name }}
+        volumeMounts:
+        - mountPath: /opt/powerdns-admin/upload
+          name: {{ $fullName }}-{{ .name }}
     {{- if .nodeSelector }}
       nodeSelector:
         {{ toYaml .nodeSelector | indent 8 }}

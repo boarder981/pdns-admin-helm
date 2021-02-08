@@ -3,7 +3,18 @@ entries:
   pdns-admin-helm:
   - apiVersion: v1
     appVersion: latest
-    created: "2021-02-08T13:50:38.961078-05:00"
+    created: "2021-02-08T14:38:11.693816-05:00"
+    description: A Helm chart for pdns-admin UI
+    digest: 8c803ebd89adbbea4394e363375e960867b60e23889c71d99c9182bf596afaf9
+    name: pdns-admin-helm
+    sources:
+    - https://github.com/pschiffe/docker-pdns
+    urls:
+    - charts/pdns-admin-helm-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v1
+    appVersion: latest
+    created: "2021-02-08T14:38:11.69049-05:00"
     description: A Helm chart for pdns-admin UI
     digest: 23d8953c8a1fc65b4ed3012259c4761ca286edaf3c7c8d9b1621e287bfdff49b
     name: pdns-admin-helm
@@ -14,7 +25,7 @@ entries:
     version: 0.2.0
   - apiVersion: v1
     appVersion: latest
-    created: "2021-02-08T13:50:38.959522-05:00"
+    created: "2021-02-08T14:38:11.688117-05:00"
     description: A Helm chart for pdns-admin UI
     digest: ccbc2f17adf63d09c144215233d86117a11b6a893a460dea88a8d45ffdc7108f
     name: pdns-admin-helm
@@ -23,4 +34,4 @@ entries:
     urls:
     - charts/pdns-admin-helm-0.1.0.tgz
     version: 0.1.0
-generated: "2021-02-08T13:50:38.956141-05:00"
+generated: "2021-02-08T14:38:11.685925-05:00"
